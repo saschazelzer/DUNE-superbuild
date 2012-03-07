@@ -27,30 +27,32 @@ macro_parse_arguments(_bootstrap
   endif()
 
   foreach(_module ${_bootstrap_MODULES})
-    set(location_args )
-    if(_bootstrap_SVN_TRUNK)
-      set(location_args
-          SVN_REPOSITORY ${dune_svn_repo}/${_dune_core_module}/trunk
-          SVN_USERNAME ${_bootstrap_SVN_USERNAME}
-          SVN_PASSWORD ${_bootstrap_SVN_PASSWORD}
-         )
-    elseif(_bootstrap_SVN_BRANCH)
-      set(location_args
-          SVN_REPOSITORY ${dune_svn_repo}/${_dune_core_module}/branches/release-${_version_major}.${_version_minor}
-          SVN_USERNAME ${_bootstrap_SVN_USERNAME}
-          SVN_PASSWORD ${_bootstrap_SVN_PASSWORD}
-         )
-    else()
-      set(location_args
-          URL ${dune_tarball_base_url}/${_dune_core_module}-${_bootstrap_VERSION}.tar.gz
-         )
-      if(${_dune_core_module}-${_bootstrap_VERSION}-md5)
-        list(APPEND location_args URL_MD5 ${${_dune_core_module}-${_bootstrap_VERSION}-md5})
+    if(DUNE_ENABLE_MODULE_${_module} OR DUNE_ENABLE_ALL_MODULES)
+      set(_src_dir ${_module}-${_bootstrap_VERSION}-src)
+      set(location_args SOURCE_DIR ${_src_dir})
+      if(_bootstrap_SVN_TRUNK)
+        list(APPEND location_args
+             SVN_REPOSITORY ${dune_svn_repo}/${_module}/trunk
+             SVN_USERNAME ${_bootstrap_SVN_USERNAME}
+             SVN_PASSWORD ${_bootstrap_SVN_PASSWORD}
+            )
+      elseif(_bootstrap_SVN_BRANCH)
+        list(APPEND location_args
+             SVN_REPOSITORY ${dune_svn_repo}/${_module}/branches/release-${_version_major}.${_version_minor}
+             SVN_USERNAME ${_bootstrap_SVN_USERNAME}
+             SVN_PASSWORD ${_bootstrap_SVN_PASSWORD}
+            )
+      else()
+        list(APPEND location_args
+             URL ${dune_tarball_base_url}/${_module}-${_bootstrap_VERSION}.tar.gz
+            )
+        if(${_module}-${_bootstrap_VERSION}-md5)
+          list(APPEND location_args URL_MD5 ${${_module}-${_bootstrap_VERSION}-md5})
+        endif()
       endif()
+      
+      duneMacroAddModule(NAME ${_module} LOCATION_ARGS ${location_args})
     endif()
-    
-    dunceMacroAddModule(NAME ${_module} LOCATION_ARGS ${location_args})
-    
   endforeach()
 
 endmacro()

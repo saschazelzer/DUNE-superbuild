@@ -36,21 +36,53 @@ macro(duneMacroAddModule)
   if(${_module_NAME}_DEPENDS)
     foreach(_dune_module_dep ${${_module_NAME}_DEPENDS})
       list(APPEND dune_module_configure_options
-           --with-${_dune_module_dep}=${CMAKE_CURRENT_BINARY_DIR}/${_dune_module_dep}-${${_module_NAME}_VERSION}-build
+           --with-${_dune_module_dep}=${CMAKE_CURRENT_BINARY_DIR}/${_dune_module_dep}-${${_dune_module_dep}_VERSION}-build
           )
     endforeach()
   endif()
   
+  # Add custom configure options
+  list(APPEND dune_module_configure_options ${DUNE_MODULE_${_module_NAME}_CONFIGURE_OPTIONS})
+  
+  # Add compiler flags
+  if(CMAKE_BUILD_TYPE STREQUAL Release)
+    list(APPEND dune_module_configure_options
+         "CXXFLAGS=${DUNE_CMAKE_CXX_FLAGS_RELEASE} ${DUNE_MODULE_${_module_NAME}_CXX_FLAGS_RELEASE}")
+  elseif(CMAKE_BUILD_TYPE STREQUAL Debug)
+    list(APPEND dune_module_configure_options
+         "CXXFLAGS=${DUNE_CMAKE_CXX_FLAGS_DEBUG} ${DUNE_MODULE_${_module_NAME}_CXX_FLAGS_DEBUG}")
+  endif()
+  
+  set(${_module_NAME}_CONFIGURE_OPTIONS ${dune_module_configure_options})
+  set(${_module_NAME}_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${_module_NAME}-${${_module_NAME}_VERSION}-build)
+  
+  macro_parse_arguments(_tmp "SOURCE_DIR" "" ${_module_LOCATION_ARGS})
+  list(GET _tmp_SOURCE_DIR 0 _tmp_SOURCE_DIR)
+  if(NOT IS_ABSOLUTE "${_tmp_SOURCE_DIR}")
+    set(_tmp_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${_tmp_SOURCE_DIR}")
+  endif()
+  if(NOT EXISTS "${_tmp_SOURCE_DIR}/configure" AND
+     NOT DUNE_BOOTSTRAP_FROM_TARBALLS)
+    set(_module_build_cmds 
+        CONFIGURE_COMMAND cat /dev/null
+        BUILD_COMMAND cat /dev/null
+       )
+    message(WARNING "!!Unconfigured DUNE module [${_module_NAME}]!!\nType make rebuild_cache && make after the initial build to complete the process.\n")
+  else()
+    set(_module_build_cmds 
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure --srcdir=<SOURCE_DIR> ${dune_module_configure_options}
+        BUILD_COMMAND $(MAKE)
+       )
+  endif()
+  
   ExternalProject_Add(${_module_NAME}
-      SOURCE_DIR ${_module_NAME}-${_bootstrap_VERSION}-src
-      BINARY_DIR ${_module_NAME}-${_bootstrap_VERSION}-build
-      PREFIX ${_module_NAME}-${_bootstrap_VERSION}-cmake
-      INSTALL_DIR ${_module_NAME}-${_bootstrap_VERSION}-install
-      ${_module_LOCATION_ARGS}
-      CONFIGURE_COMMAND <SOURCE_DIR>/configure --srcdir=<SOURCE_DIR> ${dune_module_configure_options}
-      BUILD_COMMAND $(MAKE)
-      INSTALL_COMMAND ""
-      DEPENDS ${third_party_deps} ${${_module_NAME}_DEPENDS}
-    )
+    ${_module_LOCATION_ARGS}
+    BINARY_DIR ${_module_NAME}-${${_module_NAME}_VERSION}-build
+    PREFIX ${_module_NAME}-${${_module_NAME}_VERSION}-cmake
+    INSTALL_DIR ${_module_NAME}-${${_module_NAME}_VERSION}-install
+    ${_module_build_cmds}
+    INSTALL_COMMAND ""
+    DEPENDS ${third_party_deps} ${${_module_NAME}_DEPENDS}
+  )
 
 endmacro()

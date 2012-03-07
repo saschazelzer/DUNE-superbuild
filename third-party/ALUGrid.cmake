@@ -39,7 +39,7 @@ if(DUNE_USE_ALUGRID)
     
     list(APPEND location_args URL ${${proj}_URL})
     
-    message("Building ${proj} ${DUNE_USE_ALUGRID_VERSION} from ${${proj}_URL}.")
+    message("Using ${proj} ${DUNE_USE_ALUGRID_VERSION} from ${${proj}_URL}.")
     
     set(configure_args --prefix=<INSTALL_DIR> CXX=${CMAKE_CXX_COMPILER})
     set(alugrid_cxxflags "-DNDEBUG")
@@ -76,6 +76,8 @@ if(DUNE_USE_ALUGRID)
     SET(ALUGRID_DIR "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
   
   else()
+  
+    message("Using ${proj} from ${ALUGRID_DIR}.")
 
     duneMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
     

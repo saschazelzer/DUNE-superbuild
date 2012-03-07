@@ -6,16 +6,16 @@
 macro(duneMacroGetBootstrapModuleInfo)
 
   macro_parse_arguments(_bootstrap
-                        "VERSION"
+                        ""
                         "SVN_BRANCH;SVN_TRUNK;TARBALLS"
                         ${ARGN}
                        )
 
-  set(_bootstrap_file "${CMAKE_SOURCE_DIR}/duneBootstrapCoreModules")
+  set(_bootstrap_file "${CMAKE_SOURCE_DIR}/bootstrap/duneBootstrapCoreModules")
 
   if(NOT _bootstrap_SVN_TRUNK)
     # Sanity checks
-    string(REPLACE "." ";" _version_list "${_bootstrap_VERSION}")
+    string(REPLACE "." ";" _version_list "${BOOTSTRAP_VERSION}")
     list(LENGTH _version_list _length)
     if(NOT _length EQUAL 3)
       message(FATAL_ERROR "VERSION argument must be of the form <major>.<minor>.<patch>")
@@ -25,21 +25,21 @@ macro(duneMacroGetBootstrapModuleInfo)
     list(GET _version_list 2 _version_patch)
     
     if(NOT EXISTS "${_bootstrap_file}-${_version_major}.${_version_minor}.cmake")
-      message(WARNING "Using defaults for bootstrapping DUNE core modules version ${_bootstrap_VERSION}")
+      message(WARNING "Using defaults for bootstrapping DUNE core modules version ${BOOTSTRAP_VERSION}")
       set(_bootstrap_file "${_bootstrap_file}-fallback.cmake")
     else()
       set(_bootstrap_file "${_bootstrap_file}-${_version_major}.${_version_minor}.cmake")
     endif()
   else()
-    set(_bootstrap_VERSION "svntrunk")
     set(_bootstrap_file "${_bootstrap_file}-svntrunk.cmake")
   endif()
 
   # Include CMake file setting core module dependencies information
   include(${_bootstrap_file})
-  
+
   foreach(_module ${dune_core_modules})
-    set(${_module}_VERSION "${_bootstrap_VERSION}")
+    set(${_module}_BOOTSTRAPPED 1)
+    set(${_module}_VERSION "${BOOTSTRAP_VERSION}")
   endforeach()
 
 endmacro()

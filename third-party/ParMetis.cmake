@@ -38,7 +38,7 @@ if(DUNE_USE_PARMETIS)
     
     list(APPEND location_args URL ${${proj}_URL})
     
-    message("Building ${proj} ${DUNE_USE_PARMETIS_VERSION} from ${${proj}_URL}.")
+    message("Using ${proj} ${DUNE_USE_PARMETIS_VERSION} from ${${proj}_URL}.")
     
     # We require MPI for building ParMetis
     find_package(MPI)
@@ -106,16 +106,48 @@ if(DUNE_USE_PARMETIS)
       set(PARMETIS_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
       
       # Work around a possible bug in parmetis CMake scripts which leads to missing
-      # metis.h in the install folder
+      # metis.h in the install folder. Also, some DUNE modules look for the header
+      # and lib files in the root directory, instead of include/ and lib/
+      
+      set(copy_lib_cmds)
+      if(PARMETIS_BUILD_SHARED)
+        list(APPEND copy_lib_cmds
+             COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libparmetis${CMAKE_SHARED_LIBRARY_SUFFIX}
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+             COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libmetis${CMAKE_SHARED_LIBRARY_SUFFIX}
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+            )
+      else()
+        list(APPEND copy_lib_cmds
+             COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libparmetis${CMAKE_STATIC_LIBRARY_SUFFIX}
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+             COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libmetis${CMAKE_STATIC_LIBRARY_SUFFIX}
+                     ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+            )
+      endif()
+      
       ExternalProject_Add_Step(${proj} install-patch
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PARMETIS_METIS_PATH}/include/metis.h ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/include
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${PARMETIS_METIS_PATH}/include/metis.h
+                ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/include
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${PARMETIS_METIS_PATH}/include/metis.h
+                ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/include/parmetis.h
+                 ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
+        ${copy_lib_cmds}
         DEPENDEES install
        )
     endif()
   
   else()
   
-    message("Using ParMetis from ${PARMETIS_DIR}.")
+    message("Using ${proj} from ${PARMETIS_DIR}.")
 
     duneMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
     

@@ -38,14 +38,14 @@ if(DUNE_USE_METIS)
     
     list(APPEND location_args URL ${${proj}_URL})
     
-    message("Building ${proj} ${DUNE_USE_METIS_VERSION} from ${${proj}_URL}.")
+    message("Using ${proj} ${DUNE_USE_METIS_VERSION} from ${${proj}_URL}.")
     
     if(DUNE_USE_METIS_VERSION VERSION_LESS 5)
     
       # Use traditional make/configure steps
       
-      CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/third-party/Metis_Makefile.in"
-                     "${CMAKE_CURRENT_BINARY_DIR}/Metis_Makefile.in")
+      CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/third-party/Metis_Makefile.in"
+                     "${CMAKE_CURRENT_BINARY_DIR}/Metis_Makefile.in" @ONLY)
       
       ExternalProject_Add(${proj}
         SOURCE_DIR ${proj}-src
@@ -101,7 +101,7 @@ if(DUNE_USE_METIS)
   
   else()
   
-    message("Using Metis from ${METIS_DIR}.")
+    message("Using ${proj} from ${METIS_DIR}.")
 
     duneMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
     

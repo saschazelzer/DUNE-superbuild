@@ -94,9 +94,9 @@ The source code for DUNE modules can be located anywhere on the filesystem. To i
 
 The variables `DUNE_CMAKE_CXX_FLAGS_DEBUG` and `DUNE_CMAKE_CXX_FLAGS_RELEASE` are used to set compiler flags for all enabled DUNE modules. To customize the configure and compile flags for a specific module, use one of the following variables:
 
-  - DUNE_MODULE_<module-name>_CONFIGURE_OPTIONS
-  - DUNE_MODULE_<module-name>_CXX_FLAGS_DEBUG
-  - DUNE_MODULE_<module-name>_CXX_FLAGS_RELEASE
+  - `DUNE_MODULE_<module-name>_CONFIGURE_OPTIONS`
+  - `DUNE_MODULE_<module-name>_CXX_FLAGS_DEBUG`
+  - `DUNE_MODULE_<module-name>_CXX_FLAGS_RELEASE`
 
 To store certain settings for, write a CMake cache file and supply it as a command line argument when running CMake for the first time.
 

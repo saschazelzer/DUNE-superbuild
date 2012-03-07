@@ -53,7 +53,7 @@ Required:
   - CMake 2.8.4 or newer
   - A C++ compiler (see the [DUNE installation notes] [2])
   
-Depending on the enabled CMAke options, you might need to have additional packages installed. For example `blas, MPI, csh, Boost, gmp` etc.
+Depending on the enabled CMake options, you might need to have additional packages installed. For example `blas, MPI, csh, Boost, gmp` etc.
 
 ### Third-Party Libraries
 

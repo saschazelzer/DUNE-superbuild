@@ -3,7 +3,7 @@ DUNE Superbuild
 
 This is a CMake based meta build system for [DUNE].
 
-**Main features**
+**Main Features**
 
   - Bootstrap the DUNE core modules from tarballs or SVN repositories
   - Automatically download, configure, and build third-party libraries like ParMetis, SuperLU, ALUGrid, etc.
@@ -33,6 +33,18 @@ To build the latest stable version of DUNE with ALUGrid (for example) write:
     cd DUNE-bin
     cmake -DDUNE_BOOTSTRAP:BOOL=1 -DDUNE_USE_ALUGRID:BOOL=1 -DDUNE_ENABLE_ALL_MODULES:BOOL=1 ../DUNE-superbuild
     make -j
+    
+### Introduction
+
+This set of CMake scripts intends to make the life of people who just want to compile
+DUNE modules occasionally easier. The scripts try hard to do as much as possible
+automatically (downloading and building third-party libraries for example) while still
+enabling the user to customize the build.
+
+It can be seen as the CMake analog of dunecontrol (plus third-party library support).
+Instead of calling an external script (dunecontrol) to orchestrate the build of
+multiple DUNE moduels, the CMake scripts generate directly suitable make targets. After
+the initial CMake configuration, everything can be controlled by invoking `make <target>`.
 
 ### Prerequisites
 
@@ -55,7 +67,7 @@ The following third-party libraries can currently be automatically be build with
 
 To enable any of the above libraries, set the corresponding CMake variable `DUNE_USE_<library>` to true.
 
-### Bootstrapping DUNE core modules
+### Bootstrapping DUNE Core Modules
 
 The DUNE core modules can be automatically downloaded. To customize the version and download location, use the following variables:
 
@@ -74,9 +86,28 @@ The priority of these options is from top to bottom.
 
 This is only necessary once.
 
-### Adding DUNE modules
+### Adding DUNE Modules
 
 The source code for DUNE modules can be located anywhere on the filesystem. To include one or more DUNE modules in the DUNE superbuild, add the directory containing the modules to the `DUNE_MODULE_DIRS` variable.
+
+### Customizing Configure and Compiler Flags
+
+The variables `DUNE_CMAKE_CXX_FLAGS_DEBUG` and `DUNE_CMAKE_CXX_FLAGS_RELEASE` are used to set compiler flags for all enabled DUNE modules. To customize the configure and compile flags for a specific module, use one of the following variables:
+
+  - DUNE_MODULE_<module-name>_CONFIGURE_OPTIONS
+  - DUNE_MODULE_<module-name>_CXX_FLAGS_DEBUG
+  - DUNE_MODULE_<module-name>_CXX_FLAGS_RELEASE
+
+To store certain settings for, write a CMake cache file and supply it as a command line argument when running CMake for the first time.
+
+MyDuneOptions.txt:
+
+    set(DUNE_MODULE_DIRS "/home/sascha/DUNE-2.1.1" CACHE STRING "")
+    set(DUNE_MODULE_dune-common_CONFIGURE_OPTIONS "--with-blas=/home/sascha/lib" CACHE STRING "")
+    
+Load the file via CMake:
+
+    ccmake -C MyDuneOptions.txt <source-dir>
 
 ### Todos
 

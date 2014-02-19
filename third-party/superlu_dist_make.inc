@@ -22,13 +22,13 @@ PLAT         = _i386
 #
 #  The name of the libraries to be created/linked to
 #
-DSuperLUroot = @SUPERLU_DIST_INSTALL_DIR@
+DSuperLUroot = @SuperLU_DIST_INSTALL_DIR@
 DSUPERLULIB  = $(DSuperLUroot)/lib/libsuperlu_dist.a
 #
 BLASDEF      = -DUSE_VENDOR_BLAS
 BLASLIB      = -lblas
 METISLIB     = -L@METIS_LIBRARY_DIR@ -lmetis
-PARMETISLIB  = -L@PARMETIS_LIBRARY_DIR@ -lparmetis
+PARMETISLIB  = -L@ParMETIS_LIBRARY_DIR@ -lparmetis
 
 # Define the required Fortran libraries, if you use C compiler to link
 FLIBS        = 

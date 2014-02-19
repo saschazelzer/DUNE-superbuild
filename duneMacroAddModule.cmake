@@ -8,6 +8,16 @@ macro(duneMacroAddModule)
     CXX=${CMAKE_CXX_COMPILER}
     CPPFLAGS=${CMAKE_CXX_FLAGS}
    )
+  
+  set(_install_dir )
+  if(NOT CMAKE_INSTALL_PREFIX)
+    set(_install_dir ${PROJECT_BINARY_DIR}/DUNE-install)
+  elseif(IS_ABSOLUTE ${CMAKE_INSTALL_PREFIX})
+    set(_install_dir ${CMAKE_INSTALL_PREFIX})
+  else()
+    set(_install_dir ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX})
+  endif()
+  list(APPEND dune_module_configure_options --prefix=${_install_dir})
    
   if(NOT DUNE_ENABLE_DOCUMENTATION)
     list(APPEND dune_module_configure_options --disable-documentation)
@@ -36,7 +46,7 @@ macro(duneMacroAddModule)
   if(${_module_NAME}_DEPENDS)
     foreach(_dune_module_dep ${${_module_NAME}_DEPENDS})
       list(APPEND dune_module_configure_options
-           --with-${_dune_module_dep}=${CMAKE_CURRENT_BINARY_DIR}/${_dune_module_dep}-${${_dune_module_dep}_VERSION}-build
+           --with-${_dune_module_dep}=${_install_dir}
           )
     endforeach()
   endif()
@@ -79,9 +89,10 @@ macro(duneMacroAddModule)
     ${_module_LOCATION_ARGS}
     BINARY_DIR ${_module_NAME}-${${_module_NAME}_VERSION}-build
     PREFIX ${_module_NAME}-${${_module_NAME}_VERSION}-cmake
-    INSTALL_DIR ${_module_NAME}-${${_module_NAME}_VERSION}-install
+    #INSTALL_DIR ${_module_NAME}-${${_module_NAME}_VERSION}-install
+    INSTALL_DIR ${_install_dir}
     ${_module_build_cmds}
-    INSTALL_COMMAND ""
+    INSTALL_COMMAND $(MAKE) install
     DEPENDS ${third_party_deps} ${${_module_NAME}_DEPENDS}
   )
 

@@ -1,0 +1,6 @@
+
+set(ALUGrid_DIR @ALUGrid_DIR@)
+set(ParMETIS_DIR @ParMETIS_DIR@)
+set(PARMETIS_DIR ${ParMETIS_DIR})
+set(METIS_DIR @METIS_DIR@)
+

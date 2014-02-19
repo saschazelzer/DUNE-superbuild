@@ -15,7 +15,7 @@ if(DUNE_USE_PARMETIS)
   set(proj_DEPENDENCIES )
   set(PARMETIS_DEPENDS ${proj})
 
-  if(NOT DEFINED PARMETIS_DIR)
+  if(NOT DEFINED PARMETIS_DIR OR NOT DEFINED ParMETIS_DIR)
   
     set(DUNE_USE_PARMETIS_VERSION "" CACHE STRING "The Parallel Metis version to use")
     mark_as_advanced(DUNE_USE_PARMETIS_VERSION)
@@ -62,6 +62,7 @@ if(DUNE_USE_PARMETIS)
        )
       
       set(PARMETIS_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src)
+      set(ParMETIS_DIR ${PARMETIS_DIR})
       
     else()
     
@@ -104,6 +105,7 @@ if(DUNE_USE_PARMETIS)
        )
       
       set(PARMETIS_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+      set(ParMETIS_DIR ${PARMETIS_DIR})
       
       # Work around a possible bug in parmetis CMake scripts which leads to missing
       # metis.h in the install folder. Also, some DUNE modules look for the header

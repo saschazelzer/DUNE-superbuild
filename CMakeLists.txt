@@ -258,6 +258,7 @@ if(DUNE_BOOTSTRAP)
   topological_sort(DUNE_BOOTSTRAP_MODULES "" "_DEPENDS")
   duneMacroBootstrapCoreModules(MODULES ${DUNE_BOOTSTRAP_MODULES}
                                 VERSION ${BOOTSTRAP_VERSION}
+                                BASE_URL ${DUNE_BOOTSTRAP_BASE_URL}
                                 ${_bootstrap_type}
                                )
 endif()
@@ -323,4 +324,19 @@ endif()
 if(_build_targets)
   add_custom_target(build_all DEPENDS ${_build_targets})
 endif()
+
+#-----------------------------------------------------------------------------
+# Install support
+#-----------------------------------------------------------------------------
+
+configure_file(DUNE-superbuild-config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/DUNE-superbuild-config.cmake)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/DUNE-superbuild-config.cmake DESTINATION .)
+
+install(FILES cmake/config.h.cmake DESTINATION share/cmake)
+install(FILES cmake/FindDUNE-superbuild.cmake DESTINATION share/cmake)
+install(FILES cmake/DuneMPI.cmake DESTINATION share/cmake)
+install(FILES cmake/DuneStreams.cmake DESTINATION share/cmake)
+install(FILES cmake/FindCXX11Features.cmake DESTINATION share/cmake)
+install(FILES cmake/FindParMETIS.cmake DESTINATION share/cmake)
+install(FILES cmake/FindALUGrid.cmake DESTINATION share/cmake)
 

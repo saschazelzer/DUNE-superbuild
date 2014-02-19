@@ -136,7 +136,10 @@ function(topological_sort LIST PREFIX SUFFIX)
 
         # We have finished all of the outgoing edges for
         # SOURCE; add it to the resulting list.
-        list(APPEND ${LIST} ${SOURCE})
+        list(FIND VERTICES ${SOURCE} _vertex_id)
+        if(_vertex_id GREATER -1)
+          list(APPEND ${LIST} ${SOURCE})
+        endif()
 
         # Check the length of the stack
         list(LENGTH STACK STACK_LENGTH)
